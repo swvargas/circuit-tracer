@@ -1,0 +1,201 @@
+****************
+* Project Circuit Trace with GUI
+* Class CS 221
+* Date June 26, 2025
+* Santiago Vargas
+**************** 
+
+OVERVIEW:
+
+ CircuitTracer is an application that finds the shortest possible path connecting two points (start and end)
+ in a 2D circuit board grid while adoivding obstacles (marked with X). This used a brute-force search 
+ algorithm using either depth first (using a stack) or breadth first (using a queue).
+
+
+INCLUDED FILES:
+
+ CircuitBoard.java: Parses input file and represents the circuit board.
+
+ TraceState.java: Encapsulates the board and current path state.
+
+ Storage.java: Abstracts queue/stack functionality via a unified interface.
+
+ CircuitTracer.java: The main driver. handles argument parsing, search, and output.
+
+ CircuitTracerTester.java The entire test suite driver.
+
+ CircuitTracerGUI.java: Optional GUI for interactive viewing of solutions.
+
+ InvalidFileFormatException.java and OccupiedPositionException.java: Handle error cases gracefully.
+
+ boards/(valid/invalid)(1-10/1-12).dat Different boards you can test.
+
+ README - This file.
+
+COMPILING AND RUNNING:
+ 
+ COMPILE
+ $ javac *.java
+ 
+ RUN TEST SUITE
+ $ java CircuitTracerTester
+
+ RUN USING FILE
+
+ $ java CircuitTracer <arguments> <filename>
+
+ Results of all the tests will be printed to console after the program finishes.
+ 
+ You can customize the output behavior using the following optional flags:
+ 
+
+ FIRST ARGUMENT
+ -s : Use stack Storage
+
+ -q : Use queue Storage
+
+
+ SECOND ARGUMENT
+
+ -c : Console output mode
+ 
+ -g : GUI output mode
+
+
+ THIRD ARGUMENT
+
+ <filename> this is any filename that the circuit board will read.
+
+ Example commad method for different outputs
+
+ $ java CircuitTracer -s -c inputfile.dat  # stack + console
+ $ java CircuitTracer -q -g inputfile.dat  # queue + GUI
+ 
+ Tou can clean up the java classes after you are done with.
+ 
+ LINUX/MACOS
+ $ rm -rf *.class
+ $ rm -rf *.dat
+ $ rm -rf *.out
+ 
+ WINDOWS
+ $ del /s /q *.class
+ $ del /s /q *.dat
+ $ del /s /q *.out
+ 
+PROGRAM DESIGN AND IMPORTANT CONCEPTS:
+
+ This project uses a modular, object-oriented design to separate core responsibilities across distinct
+ classes. Key design patterns and data structures are used to support flexibility, maintainability, 
+ and testing. 
+
+
+ Key Classes and Responsibilities 
+  CircuitTracer			Main entry point. Handles command-line parsing, input validation, and search control.
+  CircuitBoard			Parses the input file, validates layout, and stores the board state (char[][]).
+  TraceState				Represents a single path during the search. Used to generate valid extensions.
+  Storage						Abstracts the underlying data structure (Stack or Queue) for trace state management.
+  CircuitTracerGUI	(Optional) Visual display of the board and solutions, with a menu and path selector.
+  Custom Exceptions	Provide controlled error handling for invalid file formats and illegal trace moves.
+
+ Important Design COoncepts
+	* Brute-Force Search:
+		The main algorithm first tries all valid paths startting from 1 and going to the open neighbors
+		until it reaches 2. This ensures all shortest paths are discovereed no matter the starting diretion.
+
+	* State Representation:
+	  Each TraceState has a snapshot of the board and the path history which makes backtracing easy.
+
+	* Storage Abstraction:
+	  The Storage class wraps both Stack<TraceState> and Queue<TraceState> under a shared interface. This
+		allows runtime selection of which behaviour to use without duplicate logic.
+
+	* Input Robustness:
+	  The CircuitBoard constructor performs a lot of checks to ensure multiple thing which indluce but are
+		not limited to:
+		- Making sure only one cell with 1 and 2 
+		- Valid dimmension
+		- Valid characters
+		- Proper formating
+	* GUI Design (Extra Credit):
+	  The GUI class gives an easy to read window that shows all solutions of shortest length.
+
+
+TESTING:
+ Summary
+   The program was tested with both valid and invalid input files to ensure robust 
+	 behavior. Console and GUI outputs were verified for correctness using a variety of 
+	 grid configurations, including edge cases with no possible path and multiple optimal
+	 solutions. The CircuitTracerTester.java file was used to confirm functional correctness,
+	 and manual tests validated that all exceptions, path formatting, and GUI interactions 
+	 behaved as expected.
+
+ Test Strategy 
+   Unit Testing: Used CircuitTracerTester.java to validate all major methods and logic branches.
+   Manual Testing: Ran custom inputs with various path structures and edge cases.
+   Input Validation: Ensured bad files are caught with InvalidFileFormatException.
+
+ Test Cases
+  Valid boards: valid(1-10).dat
+	Invalid boards: invalid(1-12).dat
+
+	Multiple shortest paths: valid(1,3,4,6,7,8,9).dat
+	No-path boards: valid10.dat
+
+ Bugs Found 
+   Early return blocking GUI from launching. (Was about to email instructor about it)
+   FileNotFoundException unhandled initially.
+	 GUI trace overwriting 2 component.
+	 Trace not reset properly when switching paths.
+
+ GUI Testing 
+	 Validated trace rendering with gray text backgroun only.
+   Confirmed About/Quit menu behavior.
+   Ensured proper selection and re-rendering of solutions.
+
+
+ANALYSIS:
+
+ How does stack vs. queue affect exploration?
+   Stack: goes deep first, may find long paths before short ones.
+   Queue: explores all shallow paths first, guarantees shortest path earliest.
+
+ Is the number of states affected?
+   No — both may explore the same number of valid paths, but in different orders.
+
+ Which is more efficient?
+   Queue tends to find optimal solutions faster. So it is useful for certain cases.
+   Stack can be more memory efficient for sparse boards.
+
+ Which finds shortest path first?
+   Queue: Yes, all the time.
+	 Stack: Not really.
+
+ Memory usage?
+   Queue grows quickly as all paths at a given depth are explored.
+   Stack may use less memory but can go very deep.
+
+ Big-O runtime?
+
+  O(4^n), where n is the number of open positions.
+	Reflects the exponential number of potential paths.
+
+ What is 'n'?
+   n is the number of open cells (O) on the board — the primary complexity driver.
+
+ 
+DISCUSSION:
+  This project was honestly really fun. I was able to hone my GUI skills and algorithm
+	implementation. Some of the things I also was able to practice is input validation,
+	exception handling. One of the parts that challanged me the most was figuring out that 
+	I had leftover code that was overriden some of the tables so it made it so most tests 
+	failed. When implementing the GUI I forgot to remove the return statement I had from when 
+	I did not have it so it was returning and exiting no matter if the GUI argument was present.
+	I would say that the only part that really clicked was why the algorithm work and why one 
+	should be used over the other. I was also able to explore the memory cost that come with it.
+
+EXTRA CREDIT:
+
+	The extra credit GUI was attempted and verified it works with valid files. 
+
+ 
